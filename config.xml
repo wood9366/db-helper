@@ -10,6 +10,35 @@
   </databases>
   <tables>
     <table>
+      <name>account</name>
+      <num>100</num>
+      <database>ink_sanguo</database>
+      <fields>
+        <field>
+          <name>uid</name>
+          <type>uint64</type>
+          <auto_increase>0</auto_increase>
+        </field>
+        <field>
+          <name>username</name>
+          <type>varchar(64)</type>
+        </field>
+        <field>
+          <name>password</name>
+          <type>varchar(64)</type>
+        </field>
+        <field>
+          <name>score</name>
+          <type>float</type>
+          <default>0</default>
+        </field>
+        <field>
+          <name>create_time</name>
+          <type>datetime</type>
+        </field>
+      </fields>
+    </table>
+    <table>
       <name>city</name>
       <database>common</database>
       <fields>
