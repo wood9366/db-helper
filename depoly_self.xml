@@ -12,6 +12,8 @@
       </database>
       <database>
         <name>ink_sanguo</name>
+        <start>0</start>
+        <num>100</num>
       </database>
     </databases>
   </connection>

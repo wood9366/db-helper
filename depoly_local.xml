@@ -1,0 +1,35 @@
+<depoly>
+  <connection>
+    <name>local_1</name>
+    <type>mariadb</type>
+    <host>127.0.0.1</host>
+    <port>3306</port>
+    <username>isg</username>
+    <password>123456</password>
+    <databases>
+      <database>
+        <name>common</name>
+      </database>
+      <database>
+        <name>ink_sanguo</name>
+        <start>0</start>
+        <num>30</num>
+      </database>
+    </databases>
+  </connection>
+  <connection>
+    <name>local_2</name>
+    <type>mariadb</type>
+    <host>127.0.0.1</host>
+    <port>3306</port>
+    <username>isg</username>
+    <password>123456</password>
+    <databases>
+      <database>
+        <name>ink_sanguo</name>
+        <start>30</start>
+        <num>70</num>
+      </database>
+    </databases>
+  </connection>
+</depoly>

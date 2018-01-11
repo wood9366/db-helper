@@ -2,7 +2,6 @@
   <databases>
     <database>
       <name>common</name>
-      <num>1</num>
     </database>
     <database>
       <name>ink_sanguo</name>
@@ -11,8 +10,26 @@
   </databases>
   <tables>
     <table>
+      <name>city</name>
+      <database>common</database>
+      <fields>
+        <field>
+          <name>uid</name>
+          <type>uint64</type>
+        </field>
+        <field>
+          <name>name</name>
+          <type>varchar(32)</type>
+        </field>
+        <field>
+          <name>force</name>
+          <type>uint16</type>
+        </field>
+      </fields>
+    <table>
       <name>hero</name>
       <num>100</num>
+      <database>ink_sanguo</database>
       <fields>
         <field>
           <name>uid</name>
