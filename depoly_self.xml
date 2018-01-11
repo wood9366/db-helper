@@ -1,4 +1,4 @@
-<distribute>
+<depoly>
   <connection>
     <name>self</name>
     <type>mariadb</type>
@@ -15,4 +15,4 @@
       </database>
     </databases>
   </connection>
-</distribute>
+</depoly>
