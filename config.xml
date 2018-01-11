@@ -1,33 +1,48 @@
 <config>
   <databases>
-    <database name="ink_sanguo"/>
-    <database name="common"/>
+    <database>
+      <name>common</name>
+      <num>1</num>
+    </database>
+    <database>
+      <name>ink_sanguo</name>
+      <num>100</num>
+    </database>
   </databases>
   <tables>
-    <table name="hero">
+    <table>
+      <name>hero</name>
+      <num>100</num>
       <fields>
-        <field name="uid">
+        <field>
+          <name>uid</name>
           <type>uint64</type>
           <auto_increase>0</auto_increase>
         </field>
-        <field name="id">
+        <field>
+          <name>id</name>
           <type>uint16</type>
         </field>
-        <field name="name">
+        <field>
+          <name>name</name>
           <type>varchar(64)</type>
         </field>
-        <field name="level">
+        <field>
+          <name>level</name>
           <type>uint16</type>
           <default>1</default>
         </field>
-        <field name="exp">
+        <field>
+          <name>exp</name>
           <type>uint32</type>
           <default>0</default>
         </field>
-        <field name="strength">
+        <field>
+          <name>strength</name>
           <type>uint8</type>
         </field>
-        <field name="intelligence">
+        <field>
+          <name>intelligence</name>
           <type>uint8</type>
         </field>
       </fields>

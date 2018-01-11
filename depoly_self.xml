@@ -1,0 +1,18 @@
+<distribute>
+  <connection>
+    <name>self</name>
+    <type>mariadb</type>
+    <host>127.0.0.1</host>
+    <port>3306</port>
+    <username>isg</username>
+    <password>123456</password>
+    <databases>
+      <database>
+        <name>common</name>
+      </database>
+      <database>
+        <name>ink_sanguo</name>
+      </database>
+    </databases>
+  </connection>
+</distribute>
