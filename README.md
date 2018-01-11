@@ -6,6 +6,7 @@
 - Perl 5.18
 ## Usage
 ### Database Config File
+Database config file, xml format, use to describe database and table structure. 
 - name of databse, table or field better to use all lower case letter and underscore.
 - ignore number of databae or table means only 1
 - support field type
@@ -59,4 +60,35 @@
     ...
   </tables>
 </config>
+```
+### Depoly Config File
+Depoly config file, xml format, use to store depoly database server information.
+* database **start** and **num** element
+  * if not define, means only 1 database should be created.
+  * with both start and num, means create more than one database, name is $dbname_$idx.
+    * dbname is database's name
+    * idx is [start, start + num), idx with 0 prefix depends on maximum number of idx. For example, maximum number of db is 100, so 3rd db's name is dbname_03.
+```xml
+<depoly>
+  <connection>
+    <name>self</name>
+    <type>mariadb</type> <!-- database server type -->
+    <host>127.0.0.1</host> <!-- database host -->
+    <port>3306</port> <!-- database port -->
+    <username>isg</username> <!-- database username -->
+    <password>123456</password> <!-- database password -->
+    <databases> <!-- database depoly info on this erver -->
+      <database>
+        <name>common</name> <!-- database name, use to find database config -->
+      </database>
+      <database>
+        <name>ink_sanguo</name>
+        <start>0</start>
+        <num>100</num>
+      </database>
+      ...
+    </databases>
+  </connection>
+</depoly>
+
 ```
