@@ -28,7 +28,7 @@
   * default
     * give a default value of field, if create talbe without value of this field, the default value will be used
     * if field is auto_increase, default is no used
-```
+```xml
 <config>
   <databases> <!-- define database list -->
     <database>
