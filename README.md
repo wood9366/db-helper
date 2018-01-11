@@ -16,7 +16,7 @@
   * float
   * datetime
   * string
-    * (var)?char(\([0-9]+\))?
+    * (var)?char(\\([0-9]+\\))?
     * prefix **var** means variable length of stirng, otherwise fixed
     * suffix (xxx) means maximum length of string
 - about null field
