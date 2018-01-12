@@ -37,11 +37,18 @@
           <type>datetime</type>
         </field>
       </fields>
+      <keys>
+        <key>uid</key>
+      </keys>
     </table>
     <table>
       <name>city</name>
       <database>common</database>
       <fields>
+        <field>
+          <name>server_id</name>
+          <type>uint16</type>
+        </field>
         <field>
           <name>uid</name>
           <type>uint64</type>
@@ -55,6 +62,11 @@
           <type>uint16</type>
         </field>
       </fields>
+      <keys>
+        <key>server_id</key>
+        <key>uid</key>
+      </keys>
+    </table>
     <table>
       <name>hero</name>
       <num>100</num>
