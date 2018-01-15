@@ -65,6 +65,11 @@ sub read_node_database {
         $err = 1;
     }
 
+    if (grep { $name eq $_->{name} } @databases) {
+        loge("duplicate name [%s]", $name);
+        $err = 1;
+    }
+
     if (not &is_suggest_name($name)) {
         logw("name [%s] better declare with a-z, 0-9 and _", $name);
     }
@@ -96,6 +101,11 @@ sub read_node_table {
         $err = 1;
     }
 
+    if (grep { $name eq $_->{name} } @tables) {
+        loge("duplicate name [%s]", $name);
+        $err = 1;
+    }
+
     if (not &is_suggest_name($name)) {
         logw("name [%s] better declare with a-z, 0-9 and _", $name);
     }
@@ -117,7 +127,7 @@ sub read_node_table {
     my @fields = ();
 
     foreach my $node_field (@{&node_child_array($node, 'fields', 'field')}) {
-        my $field = &read_node_field($node_field);
+        my $field = &read_node_field($node_field, \@fields);
 
         if ($field) {
             push @fields, $field;
@@ -157,6 +167,7 @@ sub read_node_table {
 
 sub read_node_field {
     my $node = shift;
+    my $fields = shift || [];
 
     my $err = 0;
 
@@ -167,6 +178,11 @@ sub read_node_field {
 
     if (not &is_valid_name($name)) {
         loge("invalid name [%s]", $name);
+        $err = 1;
+    }
+
+    if (grep { $name eq $_->{name} } @$fields) {
+        loge("duplicate name [%s]", $name);
         $err = 1;
     }
 
