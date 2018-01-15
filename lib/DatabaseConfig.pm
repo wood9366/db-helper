@@ -47,7 +47,10 @@ sub load_database_config {
 
     log_unindent;
 
-    return { databases => \@databases, tables => \@tables };
+    return {
+        databases => { map { $_->{name} => $_ } @databases },
+        tables => { map { $_->{name} => $_ } @tables },
+    };
 }
 
 sub read_node_database {
