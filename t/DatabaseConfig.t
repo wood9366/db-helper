@@ -33,4 +33,17 @@ is($fld1->{type}{type}, 'integer');
 ok($fld1->{type}{unsigned});
 is($fld1->{type}{size}, 64);
 
+my $fld2 = $tbl1->{fields}[1];
+
+is($fld2->{name}, 'username');
+is($fld2->{type}{type}, 'string');
+ok($fld2->{type}{variable});
+is($fld2->{type}{length}, 64);
+
+my $fld3 = $tbl1->{fields}[3];
+
+is($fld3->{name}, 'score');
+is($fld3->{type}{type}, 'float');
+is($fld3->{default}, 0);
+
 done_testing();

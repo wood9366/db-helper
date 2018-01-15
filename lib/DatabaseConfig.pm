@@ -268,19 +268,19 @@ sub parse_field_value {
 
     if ($type->{type} eq 'integer') {
         if ($val =~ /[0-9]+/) {
-            return $val;
+            return 0 + $val;
         } else {
             loge("invalid integer field type value [%s]", $val);
         }
     } elsif ($type->{type} eq 'string') {
         if ($val =~ /\w+/) {
-            return $val;
+            return '' + $val;
         } else {
             loge("invalid string field type value [%s]", $val);
         }
     } elsif ($type->{type} eq 'float') {
         if ($val =~ /[0-9]+(?:\.[0-9]+)?/) {
-            return $val;
+            return 0 + $val;
         } else {
             loge("invalid float field type value [%s]", $val);
         }
