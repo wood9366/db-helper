@@ -7,21 +7,17 @@ use DatabaseConfig;
 
 my $config = load_database_config('config.xml');
 
-is(@{$config->{databases}}, 2);
-
-my $db1 = $config->{databases}[0];
+my $db1 = $config->{databases}{common};
 
 is($db1->{name}, 'common');
 is($db1->{num}, 1, "default database number");
 
-my $db2 = $config->{databases}[1];
+my $db2 = $config->{databases}{ink_sanguo};
 
 is($db2->{name}, 'ink_sanguo');
 is($db2->{num}, 100);
 
-is(@{$config->{tables}}, 3);
-
-my $tbl1 = $config->{tables}[0];
+my $tbl1 = $config->{tables}{account};
 
 is($tbl1->{name}, 'account');
 is($tbl1->{num}, 100);
