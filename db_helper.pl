@@ -83,7 +83,7 @@ sub load_database_config() {
         my @fields = ();
 
         foreach my $node_field (@{&node_child_array($node_tbl, 'fields', 'field')}) {
-            my ($field, $info) = &parse_node_field($node_field);
+            my ($field, $info) = &read_node_field($node_field);
 
             if (@{$info->{err}}) {
                 push @err, { "field [$info->{name}]" => $info->{err} };
@@ -146,12 +146,6 @@ sub node_child_array() {
     return \@array;
 }
 
-sub parse_field_type() {
-    my %type = ();
-
-    return \%type;
-}
-
 sub print_info() {
     my $err = shift;
     my $flag = shift || 'I';
@@ -168,7 +162,7 @@ sub print_info() {
     }
 }
 
-sub parse_node_field() {
+sub read_node_field() {
     my $node = shift;
 
     my @err = ();
