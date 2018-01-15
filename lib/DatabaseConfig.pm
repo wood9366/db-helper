@@ -178,14 +178,25 @@ sub read_node_field {
 
     $err = 1 unless $type;
 
+    my $auto_increase;
+
+    if ($type and $type->{type} eq 'integer' and $node->has_child('auto_increase')) {
+        my $text = $node->field('auto_increase');
+
+        my $re = sprintf(qr/^%s[0-9]+$/, $type->{unsigned} ? '' : qr/-?/);
+
+        if ($text =~ $re) {
+            $auto_increase = 0 + $text;
+        } else {
+            loge("invalid auto increase value [%s]", $text);
+            $err = 1;
+        }
+    }
+
     my $default;
 
     if ($type and $node->has_child('default')) {
-        my $node_default = $node->field('default');
-
-        $node_default = defined($node_default) ? $node_default : '';
-
-        $default = &parse_field_value($type, $node_default);
+        $default = &parse_field_value($type, $node->field('default'));
 
         $err = 1 unless defined($default);
     }
@@ -197,6 +208,7 @@ sub read_node_field {
     if (not $err) {
         $field = { name => $name, type => $type };
         $field->{default} = $default if defined($default);
+        $field->{auto_increase} = $auto_increase if defined($auto_increase);
     }
 
     return $field;
