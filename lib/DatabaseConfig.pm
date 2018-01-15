@@ -137,10 +137,10 @@ sub read_node_table {
             loge("invalid key [%s]", $key);
         }
 
-        if (not $err_key) {
-            push @keys, $key;
-        } else {
+        if ($err_key) {
             $err = 1;
+        } else {
+            push @keys, $key;
         }
     }
 
@@ -174,29 +174,96 @@ sub read_node_field {
         logw("name [%s] better declare with a-z, 0-9 and _", $name);
     }
 
-    my $type = $node->field('type');
+    my $type = &parse_field_type($node->field('type'));
 
-    if (not &is_valid_field_type($type)) {
-        loge("invalid type [%s]", $type);
-        $err = 1;
-    }
+    $err = 1 unless $type;
 
     my $default;
 
-    if ($node->has_child('default')) {
-        $default = $node->field('default') || '';
+    if ($type and $node->has_child('default')) {
+        my $node_default = $node->field('default');
 
-        if (not &is_valid_field_value($type, $default)) {
-            loge("invalid default value [%s]", $default);
-            $err = 1;
-        }
+        $node_default = defined($node_default) ? $node_default : '';
+
+        $default = &parse_field_value($type, $node_default);
+
+        $err = 1 unless defined($default);
     }
 
     log_unindent;
 
-    return $err ? undef : {
-        name => $name, type => $type, default => $default
-    };
+    my $field;
+
+    if (not $err) {
+        $field = { name => $name, type => $type };
+        $field->{default} = $default if defined($default);
+    }
+
+    return $field;
+}
+
+sub parse_field_type {
+    my $type = shift || '';
+
+    if ($type =~ /(u)?int(8|16|32|64)?/) {
+        return {
+            type => 'integer',
+            unsigned => defined($1) ? 1 : 0,
+            size => defined($2) ? 0 + $2 : 32,
+        };
+    } elsif ($type =~ /float/) {
+        return {
+            type => 'float'
+        };
+    } elsif ($type =~ /datetime/) {
+        return {
+            type => 'datetime'
+        };
+    } elsif ($type =~ /(var)?char(?:\(([0-9]+)\))?/) {
+        return {
+            type => 'string',
+            variable => defined($1) ? 1 : 0,
+            length => defined($2) ? 0 + $2 : 32,
+        };
+    } else {
+        loge("invalid field type [%s]", $_);
+        return undef;
+    }
+}
+
+sub parse_field_value {
+    my $type = shift;
+    my $val = shift;
+
+    if ($type->{type} eq 'integer') {
+        if ($val =~ /[0-9]+/) {
+            return $val;
+        } else {
+            loge("invalid integer field type value [%s]", $val);
+        }
+    } elsif ($type->{type} eq 'string') {
+        if ($val =~ /\w+/) {
+            return $val;
+        } else {
+            loge("invalid string field type value [%s]", $val);
+        }
+    } elsif ($type->{type} eq 'float') {
+        if ($val =~ /[0-9]+(?:\.[0-9]+)?/) {
+            return $val;
+        } else {
+            loge("invalid float field type value [%s]", $val);
+        }
+    } elsif ($type->{type} eq 'datetime') {
+        if ($val =~ /NOW/) {
+            return $val;
+        } else {
+            loge("invalid datetime field type value [%s]", $val);
+        }
+    } else {
+        loge("can't parse field type [%s] value [%s]", $type->type, $val);
+    }
+
+    return undef;
 }
 
 sub is_valid_name {
