@@ -236,7 +236,7 @@ sub read_node_field {
 sub parse_field_type {
     my $type = shift || '';
 
-    if ($type =~ /(u)?int(8|16|32|64)?/) {
+    if ($type =~ /(u)?int(8|16|24|32|64)?/) {
         return {
             type => 'integer',
             unsigned => defined($1) ? 1 : 0,

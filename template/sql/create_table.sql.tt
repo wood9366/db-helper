@@ -1,0 +1,39 @@
+[%- BLOCK field/type %]
+[%- SWITCH type.type %]
+[%-   CASE 'integer' %]
+[%-     SWITCH type.size %]
+[%-       CASE 8 -%]
+TINYINT
+[%-       CASE 16 -%]
+SMALLINT
+[%-       CASE 24 -%]
+MEDIUMINT
+[%-       CASE 32 -%]
+INT
+[%-       CASE 64 -%]
+BIGINT
+[%-       CASE DEFAULT -%]
+INT
+[%-     END %]
+[%-     ' UNSIGNED' IF type.unsigned %]
+[%-   CASE 'float' -%]
+FLOAT
+[%-   CASE 'string' -%]
+[%- 'VAR' IF type.variable %]CHAR([%- type.length %])
+[%-   CASE 'datetime' -%]
+DATETIME
+[%- END %]
+[%- END -%]
+
+[%- BLOCK field/define -%]
+`[% field.name %]` [% PROCESS field/type type=field.type %] NOT NULL
+[%-   " DEFAULT '" _ field.default _ "'" IF field.defined('default') %]
+[%-   ' AUTO_INCREAMENT' IF field.type.type == 'integer' and field.defined('auto_increase') %]
+[%- END -%]
+
+CREATE TABLE IF NOT EXIST `[% db %]`.`[% table %]` (
+[%- FOR field IN fields %]
+    [% PROCESS field/define field=field %],
+[%- END %]
+    PRIMARY KEY([% FOREACH key IN keys -%]`[%- key %]`[% ', ' UNLESS loop.last %][% END %])
+) ENGINE=[% engine %], CHARSET=[% charset %];

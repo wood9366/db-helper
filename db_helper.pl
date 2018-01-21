@@ -8,12 +8,23 @@ no warnings 'experimental::smartmatch';
 
 use Data::Dumper;
 use Template;
+use File::Basename;
+use File::Spec::Functions;
+use Cwd 'abs_path';
 
 use DatabaseConfig;
+
+my $dir = dirname(abs_path($0));
 
 my $db_config = load_database_config('config.xml');
 
 # say Dumper($db_config);
+
+# setup tempalte
+my $tt = Template->new({
+    INCLUDE_PATH => catfile($dir, 'template'),
+    TRIM => 1,
+}) || die "$Template::ERROR", "\n";
 
 my @sqls = ();
 
@@ -31,77 +42,40 @@ sub get_name {
     return $name;
 }
 
-# generate create database sql
-sub sql_create_database {
-    return sprintf("CREATE DATABASE IF NOT EXISTS `%s`;", shift || '');
+sub gen_sql {
+    my $template = shift;
+    my $vars = shift;
+
+    my $output = '';
+
+    $tt->process("sql/${template}.sql.tt", $vars, \$output) || die $tt->error(), "\n";
+
+    return $output;
 }
 
+# generate create database sql
 foreach my $db (values %{$db_config->{databases}}) {
     foreach my $idx (0 .. $db->{num} - 1) {
-        push @sqls, sql_create_database(get_name($db->{name}, $idx, $db->{num}));
+        my $vars = { name => get_name($db->{name}, $idx, $db->{num}) };
+
+        push @sqls, gen_sql('create_database', $vars);
     }
 }
 
 # generate create table sql
-sub sql_create_table {
-    my $db_name = shift;
-    my $tbl_name = shift;
-    my $tbl = shift;
-
-    my $sql = "CREATE TABLE IF NOT EXISTS `$db_name`.`$tbl_name`(";
-
-    foreach my $field (@{$tbl->{fields}}) {
-        my $is_valid_type = 1;
-        my $sql_field = "\n  `$field->{name}`";
-
-        given ($field->{type}{type}) {
-            when (/^integer$/) {
-                $sql_field .= ' INT';
-                $sql_field .= ' UNSIGNED' if $field->{type}{unsigned};
-                $sql_field .= ' NOT NULL';
-                $sql_field .= ' DEFAULT ' . $field->{default} if exists $field->{default};
-                $sql_field .= ' AUTO_INCREMENT' if exists $field->{auto_increase};
-            }
-            when (/^float$/) {
-                $sql_field .= ' FLOAT';
-                $sql_field .= ' NOT NULL';
-                $sql_field .= ' DEFAULT ' . $field->{default} if exists $field->{default};
-            }
-            when (/^string$/) {
-                $sql_field .= sprintf(" %sCHAR(%d)",
-                                      $field->{type}{variable} ? 'VAR' : '',
-                                      $field->{type}{length});
-                $sql_field .= ' NOT NULL';
-                $sql_field .= " DEFAULT '$field->{default}'" if exists $field->{default};
-            }
-            when (/^datatime$/) {
-                $sql_field .= ' DATETIME';
-                $sql_field .= ' NOT NULL';
-                $sql_field .= ' DEFAULT NOW()' if $field->{default} eq 'NOW';
-            }
-            default { $is_valid_type = 0; }
-        }
-
-        $sql_field .= ",";
-
-        $sql .= $sql_field if $is_valid_type;
-    }
-
-    $sql .= sprintf("\n  PRIMARY KEY (%s)", join(',', map { "`$_`" } @{$tbl->{keys}}));
-    $sql .= "\n) ENGINE=innodb, CHARSET=utf8;";
-
-    return $sql;
-}
-
 foreach my $tbl (values %{$db_config->{tables}}) {
     my $db = $db_config->{databases}{$tbl->{database}};
 
     foreach my $db_idx (0 .. $db->{num} - 1) {
         foreach my $tbl_idx (0 .. $tbl->{num} - 1) {
-            push @sqls, sql_create_table(
-                get_name($db->{name}, $db_idx, $db->{num}),
-                get_name($tbl->{name}, $tbl_idx, $tbl->{num}),
-                $tbl);
+            my $vars = $tbl;
+
+            $vars->{engine} = 'innodb';
+            $vars->{charset} = 'utf8';
+            $vars->{db} = get_name($db->{name}, $db_idx, $db->{num});
+            $vars->{table} = get_name($tbl->{name}, $tbl_idx, $tbl->{num});
+
+            push @sqls, gen_sql('create_table', $vars);
         }
     }
 }
