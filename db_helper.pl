@@ -1,17 +1,35 @@
 #!/usr/bin/env perl
 
 use v5.10.1;
+
 use warnings;
 use strict;
+no warnings 'experimental::smartmatch';
+
 use Data::Dumper;
+use Template;
 
 use DatabaseConfig;
 
 my $db_config = load_database_config('config.xml');
 
-say Dumper($db_config);
+# say Dumper($db_config);
 
 my @sqls = ();
+
+sub get_name {
+    my $name = shift || '';
+    my $idx = shift || 0;
+    my $num = shift || 1;
+
+    if ($num > 1) {
+        my $n = length($num - 1);
+
+        $name .= sprintf("_%0${n}d", $idx);
+    }
+
+    return $name;
+}
 
 # generate create database sql
 sub sql_create_database {
@@ -19,14 +37,8 @@ sub sql_create_database {
 }
 
 foreach my $db (values %{$db_config->{databases}}) {
-    my $n = length($db->{num} - 1);
-
     foreach my $idx (0 .. $db->{num} - 1) {
-        my $name = $db->{name};
-
-        $name .= sprintf("_%0${n}d", $idx) if $db->{num} > 1;
-
-        push @sqls, sql_create_database($name);
+        push @sqls, sql_create_database(get_name($db->{name}, $idx, $db->{num}));
     }
 }
 
@@ -84,20 +96,12 @@ sub sql_create_table {
 foreach my $tbl (values %{$db_config->{tables}}) {
     my $db = $db_config->{databases}{$tbl->{database}};
 
-    my $db_n = length($db->{num} - 1);
-    my $tbl_n = length($tbl->{num} - 1);
-
     foreach my $db_idx (0 .. $db->{num} - 1) {
-        my $db_name = $db->{name};
-
-        $db_name .= sprintf("_%0${db_n}d", $db_idx) if $db->{num} > 1;
-
         foreach my $tbl_idx (0 .. $tbl->{num} - 1) {
-            my $tbl_name = $tbl->{name};
-
-            $tbl_name .= sprintf("_%0${tbl_n}d", $tbl_idx) if $tbl->{num} > 1;
-
-            push @sqls, sql_create_table($db_name, $tbl_name, $tbl);
+            push @sqls, sql_create_table(
+                get_name($db->{name}, $db_idx, $db->{num}),
+                get_name($tbl->{name}, $tbl_idx, $tbl->{num}),
+                $tbl);
         }
     }
 }
